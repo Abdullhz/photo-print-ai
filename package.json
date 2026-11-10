@@ -1,0 +1,17 @@
+{
+  "name": "photo-print-ai",
+  "version": "1.0.0",
+  "description": "مساعد ذكي لخدمات التصوير والمطبوعات يعتمد على Llama مع لوحة تحكم لإدارة الأسعار",
+  "main": "server.js",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=22.9" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --env-file-if-exists=.env --watch server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
