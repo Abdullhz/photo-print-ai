@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>لوحة التحكم | إدارة الأسعار</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23d9572b'/%3E%3Ccircle cx='16' cy='17' r='6' fill='none' stroke='white' stroke-width='2.5'/%3E%3Crect x='11' y='7' width='10' height='4' rx='1.5' fill='white'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="admin-body">
+  <header class="site-header">
+    <div class="container">
+      <a class="logo" href="/">
+        <span class="logo-mark" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        </span>
+        <span>لوحة التحكم</span>
+      </a>
+      <nav class="nav">
+        <a href="/">الموقع</a>
+        <a href="#" id="logout-link" hidden>تسجيل الخروج</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- تسجيل الدخول -->
+  <main id="login-view" class="login-wrap" hidden>
+    <form class="card login-card" id="login-form" novalidate>
+      <h1>دخول المدير</h1>
+      <p>سجّل الدخول لإدارة الخدمات والأسعار.</p>
+      <div class="field">
+        <label for="username">اسم المستخدم</label>
+        <input id="username" name="username" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">كلمة المرور</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <div class="alert" id="login-error" role="alert" hidden></div>
+      <button class="btn btn-primary btn-block" id="login-btn" type="submit">دخول</button>
+    </form>
+  </main>
+
+  <!-- لوحة الإدارة -->
+  <main id="dash-view" class="container dash" hidden>
+    <div class="dash-head">
+      <div>
+        <h1>إدارة الخدمات والأسعار</h1>
+        <p>أي تعديل هنا ينعكس فورًا على قائمة الأسعار وإجابات المساعد الذكي.</p>
+      </div>
+      <button class="btn btn-primary" id="add-btn" type="button">+ إضافة خدمة</button>
+    </div>
+
+    <div class="stats">
+      <div class="card stat"><div class="label">إجمالي الخدمات</div><div class="value" id="stat-total">—</div></div>
+      <div class="card stat"><div class="label">الخدمات المفعّلة</div><div class="value" id="stat-active">—</div></div>
+      <div class="card stat"><div class="label">الفئات</div><div class="value" id="stat-cats">—</div></div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <label class="sr-only" for="search">بحث</label>
+        <input class="input" id="search" type="search" placeholder="ابحث باسم الخدمة…">
+        <label class="sr-only" for="cat-filter">الفئة</label>
+        <select class="input" id="cat-filter"><option value="">كل الفئات</option></select>
+      </div>
+      <div class="table-wrap">
+        <table class="svc-table">
+          <thead>
+            <tr><th>الخدمة</th><th>الفئة</th><th>السعر</th><th>الحالة</th><th><span class="sr-only">إجراءات</span></th></tr>
+          </thead>
+          <tbody id="svc-body"></tbody>
+        </table>
+      </div>
+      <div class="table-empty" id="table-empty" hidden>لا توجد نتائج مطابقة.</div>
+    </div>
+  </main>
+
+  <!-- نموذج إضافة/تعديل -->
+  <dialog id="svc-dialog" aria-labelledby="dialog-title">
+    <form id="svc-form" novalidate>
+      <div class="dialog-head">
+        <h2 id="dialog-title">إضافة خدمة</h2>
+        <button class="btn btn-ghost btn-icon" type="button" data-close aria-label="إغلاق">✕</button>
+      </div>
+      <div class="dialog-body">
+        <div class="field">
+          <label for="f-name">اسم الخدمة *</label>
+          <input id="f-name" name="name" maxlength="120" required>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="f-category">الفئة *</label>
+            <input id="f-category" name="category" maxlength="60" list="cat-list" required>
+            <datalist id="cat-list"></datalist>
+          </div>
+          <div class="field">
+            <label for="f-unit">الوحدة *</label>
+            <input id="f-unit" name="unit" maxlength="60" placeholder="مثال: صورة، جلسة، 500 بطاقة" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-price">السعر *</label>
+          <input id="f-price" name="price" type="number" min="0" step="0.01" inputmode="decimal" required>
+          <span class="hint" id="currency-hint"></span>
+        </div>
+        <div class="field">
+          <label for="f-description">الوصف</label>
+          <textarea id="f-description" name="description" maxlength="400" placeholder="تفاصيل تساعد المساعد الذكي على اقتراح الخدمة بدقة"></textarea>
+        </div>
+        <label class="check"><input type="checkbox" id="f-active" name="active" checked> الخدمة مفعّلة وظاهرة للعملاء</label>
+        <div class="alert mt" id="form-error" role="alert" hidden></div>
+      </div>
+      <div class="dialog-foot">
+        <button class="btn btn-primary" id="save-btn" type="submit">حفظ</button>
+        <button class="btn btn-ghost" type="button" data-close>إلغاء</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- تأكيد الحذف -->
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title">
+    <div class="dialog-head"><h2 id="confirm-title">حذف الخدمة</h2></div>
+    <div class="dialog-body"><p id="confirm-text"></p></div>
+    <div class="dialog-foot">
+      <button class="btn btn-danger" id="confirm-yes" type="button">حذف نهائي</button>
+      <button class="btn btn-ghost" type="button" data-close>إلغاء</button>
+    </div>
+  </dialog>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>
